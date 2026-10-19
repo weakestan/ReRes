@@ -1,59 +1,56 @@
-<!DOCTYPE HTML>
-<html ng-app="reres">
+<!DOCTYPE html>
+<html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <title></title>
-    <link rel="stylesheet" href="css/bootstrap.min.css"/>
-    <link rel="stylesheet" href="css/popup.css"/>
-    <script type="text/javascript" src="js/angular.min.js"></script>
-    <script type="text/javascript" src="js/popup.js"></script>
+    <title>ReRes</title>
+    <link rel="stylesheet" href="css/ui.css">
 </head>
-<body ng-controller="mapListCtrl">
-<div class="container">
-<div class="btnBox">
-    <button tabIndex="-1" class="btn btn-primary btn-xs" ng-click="addRule()">添加规则</button>
-    <a href="options.html" target="_blank" tabIndex="-1" class="btn btn-primary btn-xs">管理规则</a>
-    <a href="https://github.com/hanan198501/ReRes" target="_blank" tabIndex="-1" class="btn btn-primary btn-xs">Github</a>
-    <a href="http://cssha.com/reres" target="_blank" tabIndex="-1" class="btn btn-primary btn-xs">使用帮助</a>
-</div>
+<body class="popup">
+<header class="bar">
+    <div class="brand">ReRes <small>MV3</small></div>
+    <div class="spacer"></div>
+    <button id="addBtn" class="btn btn-ghost btn-xs" type="button">+ 添加规则</button>
+</header>
 
-<div style="display:{{editDisplay}};" class="editBox">
-    <button type="button" class="close" aria-hidden="true" ng-click="hideEditBox()">&times;</button>
-    <div class="errorMsg">{{inputError}}</div>
-    <div class="form-group">
-        <label for="req">If URL match:</label>
-        <input type="text" class="form-control" id="req" ng-model="curRule.req"/>
+<main>
+    <div id="status" class="status">
+        <span class="dot"></span>
+        <span id="statusText">正在读取规则…</span>
     </div>
-    <div class="form-group">
-        <label for="res">Response:</label>
-        <input type="text" class="form-control" id="res" ng-model="curRule.res"/>
-    </div>
-    <div class="form-group">
-        <label for="res">Group:</label>
-        <input type="text" class="form-control" id="group" ng-model="curRule.group"/>
-    </div>
-    <!--<div class="form-group">
-        <label for="type">Type:</label>
-        <select ng-model="curRule.type" class="form-control" id="type">
-            <option value="file">URL映射</option>
-            <option value="dir">目录映射</option>
-        </select>
-    </div>-->
-    <button class="btn-block btn btn-primary" ng-click="saveRule()">保存</button>
-</div>
-<div ng-repeat="(group, rulesMap) in rules track by $index">
-    <h5 style="text-align: center;font-weight: bold;">[{{group || group === unidefined || '未命名'}}]</h5>
-    <table class="table table-hover">
-        <tr ng-repeat="rule in rulesMap track by $index">
-            <td>
-                <label title="Responese: {{rule.res}}"><input type="checkbox" ng-model="rule.checked"/> {{rule.req}}</label>
-                <button ng-click="edit(rule)" type="button" class="btn btn-primary btn-xs edit">编辑</button>
-                <button ng-click="removeUrl(rule)" type="button" class="btn btn-default btn-xs remove">删除</button>
-            </td>
-        </tr>
-    </table>
-</div>
 
-</div>
+    <form id="form" class="form" hidden>
+        <div class="field">
+            <label for="req">If URL match（JS 正则，不要写首尾的 / 和 /gi）</label>
+            <input id="req" type="text" spellcheck="false" placeholder="^https?://cdn\.example\.com/static/">
+        </div>
+        <div class="field">
+            <label for="res">Response（http(s):// 地址或 file:///local/文件名）</label>
+            <input id="res" type="text" spellcheck="false" placeholder="http://127.0.0.1:5500/static/">
+        </div>
+        <div class="field">
+            <label for="group">Group（可选）</label>
+            <input id="group" type="text" spellcheck="false" placeholder="项目名">
+        </div>
+        <p class="hint">Response 会替换掉 URL 中与正则匹配的部分，可用 $1 引用捕获组。</p>
+        <div id="formError" class="form-error" hidden></div>
+        <div class="actions">
+            <button class="btn btn-primary" type="submit">保存</button>
+            <button id="cancelBtn" class="btn btn-light" type="button">取消</button>
+        </div>
+    </form>
+
+    <div id="list"></div>
+</main>
+
+<footer class="foot">
+    <a id="optionsLink" href="options.html" target="_blank">管理规则</a>
+    <a href="https://github.com/annnhan/ReRes" target="_blank">GitHub</a>
+    <span class="spacer"></span>
+    <span id="count"></span>
+</footer>
+
+<script src="js/rule-engine.js"></script>
+<script src="js/shared.js"></script>
+<script src="js/popup.js"></script>
 </body>
 </html>

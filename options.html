@@ -1,83 +1,78 @@
-<!DOCTYPE HTML>
-<html ng-app="reres">
+<!DOCTYPE html>
+<html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <title>ResRes Options</title>
-    <link rel="icon" href="icon.png" mce_href="icon.png" type=”image/x-icon”>
-    <link rel="stylesheet" href="css/bootstrap.min.css"/>
-    <link rel="stylesheet" href="css/options.css"/>
-    <script type="text/javascript" src="js/angular.min.js"></script>
-    <script type="text/javascript" src="js/options.js"></script>
+    <title>ReRes - 规则管理</title>
+    <link rel="stylesheet" href="css/ui.css">
 </head>
-<body ng-controller="mapListCtrl">
-<div class="navbar navbar-inverse navbar-fixed-top top">
-    <div class="container">
-        <div class="btnBox">
-            <span class="h2"><a title="view in the github" href="https://github.com/hanan198501/ReRes" target="_blank">ReRes</a></span>
-            <small> &nbsp;&nbsp;&nbsp;&nbsp;Change the response of the request.</small>
-            <button class="btn btn-primary fr" ng-click="export()">导出</button>
-            <div class="file fr"><button class="btn btn-primary">导入</button><input type="file" id="jsonFile"/></div>
-            <button class="btn btn-primary fr" ng-click="addRule()"> + </button>
-        </div>
-    </div>
-</div>
-<div class="container">
-    <div style="display:{{editDisplay}};" class="editBox">
-        <button type="button" class="close" aria-hidden="true" ng-click="hideEditBox()">&times;</button>
-        <div class="errorMsg">{{inputError}}</div>
-        <div class="form-group">
-            <label for="req">If URL match:</label>
-            <input type="text" class="form-control" id="req" ng-model="curRule.req"/>
-        </div>
-        <div class="form-group">
-            <label for="res">Response:</label>
-            <input type="text" class="form-control" id="res" ng-model="curRule.res"/>
-        </div>
-        <div class="form-group">
-            <label for="res">Group:</label>
-            <input type="text" class="form-control" id="res" ng-model="curRule.group"/>
-        </div>
-<!--        <div class="form-group">
-            <label for="type">Type:</label>
-            <select ng-model="curRule.type" class="form-control" id="type">
-                <option value="file">URL映射</option>
-                <option value="dir">目录映射</option>
-            </select>
-        </div>-->
-        <button class="btn-block btn btn-primary" ng-click="saveRule()">保存</button>
-    </div>
-    <table>
-        <tboby>
-            <tr ng-repeat="(group, rulesMap) in rules track by $index">
-                <td>
-                    <table class="table table-hover table-bordered">
-                        <thead>
-                            <td>Group</td>
-                            <td>Enable</td>
-                            <td>If URL match</td>
-                            <td>Response</td>
-                            <!--<td>Type</td>-->
-                            <td>Operating</td>
-                        </thead>
-                        <tbody>
-                            <tr ng-repeat="rule in rulesMap track by $index">
-                                <td ng-if="$index === 0" rowspan="{{rulesMap.length}}" style="width: 140px;vertical-align: middle;border-right: 1px solid #ddd;background: #fff;">{{group || group === unidefined || '未命名'}}</td>
-                                <td><input type="checkbox" ng-model="rule.checked"/></td>
-                                <td><div title="{{rule.req}}">{{rule.req}}</div></td>
-                                <td><div title="{{rule.res}}">{{rule.res}}</div></td>
-                                <!--<td>{{rule.type == "file" ? "URL映射" : "目录映射"}}</td>-->
-                                <td>
-                                    <button ng-click="edit(rule)" type="button" class="btn btn-primary btn-xs edit">编辑</button>
-                                    <button ng-click="removeUrl(rule)" type="button" class="btn btn-default btn-xs remove">删除</button>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </td>
-            </tr>
-        </tboby>
-    </table>
+<body class="options">
+<header class="bar">
+    <div class="brand">ReRes <small>MV3</small></div>
+    <div class="spacer"></div>
+    <button id="addBtn" class="btn btn-ghost btn-xs" type="button">+ 添加规则</button>
+    <button id="importBtn" class="btn btn-ghost btn-xs" type="button">导入</button>
+    <button id="exportBtn" class="btn btn-ghost btn-xs" type="button">导出</button>
+    <input id="importFile" type="file" accept="application/json,.json" hidden>
+</header>
 
-</div>
+<main class="options-wrap">
+    <div id="status" class="status">
+        <span class="dot"></span>
+        <span id="statusText">正在读取规则…</span>
+    </div>
+
+    <form id="form" class="form" hidden>
+        <div class="field">
+            <label for="req">If URL match（JS 正则，不要写首尾的 / 和 /gi）</label>
+            <input id="req" type="text" spellcheck="false" placeholder="^https?://cdn\.example\.com/static/">
+        </div>
+        <div class="field">
+            <label for="res">Response（http(s):// 地址或 file:///local/文件名）</label>
+            <input id="res" type="text" spellcheck="false" placeholder="http://127.0.0.1:5500/static/">
+        </div>
+        <div class="field">
+            <label for="group">Group（可选）</label>
+            <input id="group" type="text" spellcheck="false" placeholder="项目名">
+        </div>
+        <p class="hint">Response 会替换掉 URL 中与正则匹配的部分；可用 $1 ~ $9 引用捕获组，$&amp; 表示整个匹配。</p>
+        <div id="formError" class="form-error" hidden></div>
+        <div class="actions">
+            <button class="btn btn-primary" type="submit">保存</button>
+            <button id="cancelBtn" class="btn btn-light" type="button">取消</button>
+        </div>
+    </form>
+
+    <div id="tables"></div>
+
+    <div class="panel">
+        <h3>规则预演</h3>
+        <p class="sub">输入一个真实 URL，看看会被哪些规则改写、最终落到哪个地址。</p>
+        <div class="preview-row">
+            <input id="previewInput" type="text" spellcheck="false" placeholder="https://cdn.example.com/static/app.js">
+            <button id="previewBtn" class="btn btn-primary" type="button">预演</button>
+        </div>
+        <div id="previewOut" class="preview-out" hidden></div>
+    </div>
+
+    <div class="panel" id="diagnostics">
+        <h3>诊断</h3>
+        <p class="sub" id="diagSub">—</p>
+        <ul id="diagList" class="diag-list"></ul>
+    </div>
+
+    <div class="panel">
+        <h3>Manifest V3 下的行为差异</h3>
+        <ul class="tips">
+            <li>规则由 <code>declarativeNetRequest</code> 直接执行，不再经过扩展进程，因此比旧版更稳，但只能做「URL → URL」重定向。</li>
+            <li>Chrome 不允许扩展把请求重定向到 <code>file://</code>。本地文件请改用本地 HTTP 服务（如 <code>http://127.0.0.1:5500</code>），或把文件放进扩展目录的 <code>local/</code>，规则写成 <code>file:///local/app.js</code>。</li>
+            <li>不支持 <code>(?=)</code>、<code>(?!)</code>、<code>(?&lt;=)</code> 与反向引用，这类正则在 RE2 引擎下会报错。</li>
+            <li>同一请求只会被优先级最高的一条规则重定向，旧版「多条规则链式替换」不再生效，请把一条规则写完整。</li>
+        </ul>
+    </div>
+</main>
+
+<script src="js/rule-engine.js"></script>
+<script src="js/shared.js"></script>
+<script src="js/options.js"></script>
 </body>
 </html>

@@ -1,12 +1,14 @@
 [
     {
-        "req":"^https?:\\/\\/.*test.com",
-        "res":"http://qunar.com",
-        "checked":false
+        "req": "^https?://cdn\\.example\\.com/static/",
+        "res": "http://127.0.0.1:5500/static/",
+        "group": "demo",
+        "checked": false
     },
     {
-        "req":".*hanan.com",
-        "res":"http://cssha.com",
-        "checked":true
+        "req": "^https?://www\\.example\\.com/js/app\\.js",
+        "res": "file:///local/app.js",
+        "group": "demo",
+        "checked": false
     }
 ]
