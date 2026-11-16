@@ -4,6 +4,8 @@
 
 当前版本 **2.1.0**，Manifest V3，要求 **Chrome 116+**。
 
+> 只想快速上手？看 [USAGE.md](USAGE.md)（中英文简要说明：安装、加规则、LNA 处理、验证）。
+
 > **最新版 Chrome（142+）必读**：Chrome 142 起强制启用本地网络访问限制（LNA），
 > 把公网页面的请求映射到 `127.0.0.1` / 内网地址时，规则会生效、但请求会被浏览器拦掉，
 > 控制台报 `more-private address space` 或 `Permission was denied ... loopback`。
@@ -209,8 +211,8 @@ Permission was denied for this request to access the `loopback` address space.
 --disable-features=LocalNetworkAccessChecks
 ```
 
-- MyChrome 用户：填到 `MyChrome.ini` 的 `Params=` 里
-- 快捷方式用户：追加到「目标」末尾，例如
+- 加到 Chrome 的启动方式里：快捷方式「目标」末尾、命令行，或任意启动器的自定义参数
+- 例如快捷方式：
   `"C:\Program Files\Google\Chrome\Application\chrome.exe" --disable-features=LocalNetworkAccessChecks`
 - 加上后请求放行，浏览器只在 DevTools 里保留告警，不影响功能
 - 该参数会让这个 Chrome 实例对所有站点关闭 LNA 检查，建议只放在专门用于调试的浏览器配置里；想按来源精确放行就用方案 B
@@ -270,6 +272,8 @@ DNR 会把请求重定向到 `chrome-extension://<id>/local/app.min.js`，走扩
 ```
 .
 ├── manifest.json          MV3 清单
+├── USAGE.md               中英文简要使用说明
+├── README.md              完整文档
 ├── background.js          Service Worker：编译规则并同步为 DNR 动态规则
 ├── js/rule-engine.js      规则编译引擎（校验、$n 转换、目标类型判定、LNA 提示、预演）
 ├── js/shared.js           storage 封装与 UI 工具

@@ -334,7 +334,7 @@
             '',
             '【方案 A · 启动参数（最简单，http / https 页面都有效）】',
             '--disable-features=LocalNetworkAccessChecks',
-            'MyChrome：填到 MyChrome.ini 的 Params=；快捷方式：追加到「目标」末尾。',
+            '启动 Chrome 时加上该参数（快捷方式「目标」/ 命令行 / 启动器自定义参数）',
             '',
             '【方案 B · 策略白名单（不改启动参数，https 页面到此即可）】',
             'reg add "HKCU\\Software\\Policies\\Google\\Chrome\\LocalNetworkAccessAllowedForUrls" /v 1 /t REG_SZ /d "' + origin + '" /f'
